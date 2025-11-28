@@ -1,0 +1,43 @@
+{
+  "nodes": {
+    "jail-nix": {
+      "locked": {
+        "lastModified": 1762804237,
+        "narHash": "sha256-YQO8yAzpoGJBm2gV/j7Dq2NtWoCbaRJHpKdaxcfcsDw=",
+        "owner": "~alexdavid",
+        "repo": "jail.nix",
+        "rev": "98a6bd032c676b718c9fa26cc60a85eae92afd62",
+        "type": "sourcehut"
+      },
+      "original": {
+        "owner": "~alexdavid",
+        "repo": "jail.nix",
+        "type": "sourcehut"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1764242076,
+        "narHash": "sha256-sKoIWfnijJ0+9e4wRvIgm/HgE27bzwQxcEmo2J/gNpI=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "2fad6eac6077f03fe109c4d4eb171cf96791faa4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "jail-nix": "jail-nix",
+        "nixpkgs": "nixpkgs"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
