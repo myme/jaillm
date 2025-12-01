@@ -14,14 +14,14 @@
       ...
     }:
     {
-      lib.jaillm = import ./lib { inherit jail-nix; };
+      lib = import ./lib { inherit jail-nix; };
       overlays.default = (
         final: prev: {
           jaillm = self.lib.jaillm final {
             # Example: Add git to the jail
-            # extraCombinators = cs: [
-            #   (cs.add-pkg-deps [ final.git ])
-            # ];
+            extraCombinators = cs: [
+              (cs.add-pkg-deps [ final.git ])
+            ];
           };
         }
       );
@@ -33,21 +33,15 @@
           inherit system;
           overlays = [ self.overlays.default ];
           config = {
-            allowUnfreePredicate =
-              pkg:
-              builtins.elem pkg.pname [
-                "claude-code"
-                "codex"
-                "github-copilot-cli"
-                "gemini-cli"
-              ];
+            allowUnfreePredicate = self.lib.allowUnfree;
           };
         };
       in
       {
         packages.${system} = {
-          default = self.packages.${system}.jaillm;
+          default = pkgs.jaillm;
           jaillm = pkgs.jaillm;
+          image = import lib/image.nix pkgs { };
         };
       }
     );

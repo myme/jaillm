@@ -61,3 +61,17 @@ nix run github:myme/jaillm
     };
 }
 ```
+
+## Docker
+
+### Build and load the image
+
+```bash
+nix build github:myme/jaillm && ./result | docker load
+```
+
+### Run the image
+
+```bash
+docker run --rm -it myme/jaillm claude
+```
