@@ -2,11 +2,11 @@
   "nodes": {
     "jail-nix": {
       "locked": {
-        "lastModified": 1762804237,
-        "narHash": "sha256-YQO8yAzpoGJBm2gV/j7Dq2NtWoCbaRJHpKdaxcfcsDw=",
+        "lastModified": 1764535788,
+        "narHash": "sha256-QGjXRCmsMxSayEyail0wEpSiRCUaZaejCv2uKpcNH0E=",
         "owner": "~alexdavid",
         "repo": "jail.nix",
-        "rev": "98a6bd032c676b718c9fa26cc60a85eae92afd62",
+        "rev": "8f61c140858daf8ec21e6355b250cca6f5bf86fb",
         "type": "sourcehut"
       },
       "original": {
