@@ -19,9 +19,12 @@
         final: prev: {
           jaillm = self.lib.jaillm final {
             # Example: Add git to the jail
-            extraCombinators = cs: [
-              (cs.add-pkg-deps [ final.git ])
-            ];
+            # extraCombinators = cs: [
+            #   (cs.add-pkg-deps [ final.git ])
+            # ];
+            # extraUtils = [
+            #   final.curl
+            # ];
           };
         }
       );

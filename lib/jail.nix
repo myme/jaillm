@@ -5,7 +5,10 @@
 # Nixpkgs
 pkgs:
 
-{ extraCombinators ? _: [] }@args:
+{
+  extraCombinators ? _: [],
+  extraUtils ? [],
+}@args:
 
 let
   jail = jail-nix.lib.init pkgs;
