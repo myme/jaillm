@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+#
+# A script to run a jailed language model in Nix (or Docker).
+#
+# Usage:
+#
+# $ ./jaillm <model> [<additional arguments>...]
+#
+# Examples:
+#
+# # Run claude with access to Python 3.13
+#
+# $ ./jaillm -d python313 claude [<additional arguments>...]
+#
+# Args:
+#
+#  -d, --deps dependency   Include dependency (can be specified multiple times)
+
+set -eou pipefail
+
+filename="jaillm.nix"
+if [ "$#" -ge 1 ]; then
+    filename="$1"
+fi
+
+# If not a file, fail
+if [ ! -f "$filename" ]; then
+    echo "Error: File '$filename' not found."
+    exit 1
+fi
+
+nix run -f "$filename"

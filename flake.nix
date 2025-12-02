@@ -13,21 +13,11 @@
       nixpkgs,
       ...
     }:
-    {
+    let
       lib = import ./lib { inherit jail-nix; };
-      overlays.default = (
-        final: prev: {
-          jaillm = self.lib.jaillm final {
-            # Example: Add git to the jail
-            # extraCombinators = cs: [
-            #   (cs.add-pkg-deps [ final.git ])
-            # ];
-            # extraUtils = [
-            #   final.curl
-            # ];
-          };
-        }
-      );
+    in {
+      inherit lib;
+      overlays.default = lib.overlay;
     }
     // (
       let

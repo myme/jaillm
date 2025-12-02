@@ -8,6 +8,7 @@ pkgs:
 {
   extraCombinators ? _: [],
   extraUtils ? [],
+  ...
 }@args:
 
 let
