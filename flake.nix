@@ -17,7 +17,12 @@
       lib = import ./lib { inherit jail-nix; };
     in {
       inherit lib;
-      overlays.default = lib.overlay;
+      overlays.default = final: prev: {
+        jaillm = final.runCommand "jaillm" { } ''
+          mkdir -p $out/bin
+          cp ${./jaillm} $out/bin/jaillm
+        '';
+      };
     }
     // (
       let
@@ -29,15 +34,11 @@
             allowUnfreePredicate = self.lib.allowUnfree;
           };
         };
-        jaillm = pkgs.runCommand "jaillm" { } ''
-          mkdir -p $out/bin
-          cp ${./jaillm} $out/bin/jaillm
-        '';
       in
       {
         packages.${system} = {
-          default = jaillm;
-          jaillm = jaillm;
+          default = pkgs.jaillm;
+          jaillm = pkgs.jaillm;
           image = import lib/image.nix pkgs { };
         };
       }

@@ -19,8 +19,7 @@ if [ ! -f "$filepath" ]; then
     exit 1
 fi
 
-# export JAILLM_FLAKE="git+ssh://heap/home/myme/code/myme/jaillm?ref=incoming"
-export JAILLM_FLAKE="git+file://$(readlink -f "$(dirname "$0")")"
+export JAILLM_FLAKE="github:myme/jaillm"
 export JAILLM_NIX="$(readlink -f "$filepath")"
 
 nix run --impure --expr '

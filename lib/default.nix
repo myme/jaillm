@@ -2,7 +2,6 @@
 
 let
   jaillm = import ./jail.nix { inherit jail-nix; };
-  overlay = import ./overlay.nix jaillm;
   # Allow unfree packages for specific AI code generation tools.
   allowUnfree = pkg: builtins.elem pkg.pname [
     "claude-code"
@@ -12,7 +11,7 @@ let
   ];
 
 in {
-  inherit allowUnfree jaillm overlay;
+  inherit allowUnfree jaillm;
   build = nixpkgs: configure:
     let 
       pkgs = nixpkgs {
