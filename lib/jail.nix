@@ -16,7 +16,7 @@ let
   cs = jail.combinators;
   contents = import ./contents.nix pkgs (builtins.removeAttrs args [ "extraCombinators" ]);
 in
-jail "jaillm" contents.shell (
+jail "jaillm" contents.entry (
   [
     # Packages
     (cs.add-pkg-deps [ contents.env ])

@@ -4,17 +4,7 @@
 #
 # Usage:
 #
-# $ ./jaillm <model> [<additional arguments>...]
-#
-# Examples:
-#
-# # Run claude with access to Python 3.13
-#
-# $ ./jaillm -d python313 claude [<additional arguments>...]
-#
-# Args:
-#
-#  -d, --deps dependency   Include dependency (can be specified multiple times)
+# $ ./jaillm [jaillm.nix]
 
 set -eou pipefail
 
@@ -29,7 +19,8 @@ if [ ! -f "$filepath" ]; then
     exit 1
 fi
 
-export JAILLM_FLAKE="git+file:$(readlink -f ./)"
+# export JAILLM_FLAKE="git+ssh://heap/home/myme/code/myme/jaillm?ref=incoming"
+export JAILLM_FLAKE="git+file://$(readlink -f "$(dirname "$0")")"
 export JAILLM_NIX="$(readlink -f "$filepath")"
 
 nix run --impure --expr '
