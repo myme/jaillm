@@ -3,7 +3,4 @@ pkgs:
   llms = [
     pkgs.claude-code
   ];
-  extraUtils = [
-    pkgs.python313
-  ];
 }

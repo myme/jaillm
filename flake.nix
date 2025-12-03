@@ -29,11 +29,15 @@
             allowUnfreePredicate = self.lib.allowUnfree;
           };
         };
+        jaillm = pkgs.runCommand "jaillm" { } ''
+          mkdir -p $out/bin
+          cp ${./jaillm} $out/bin/jaillm
+        '';
       in
       {
         packages.${system} = {
-          default = pkgs.jaillm;
-          jaillm = pkgs.jaillm;
+          default = jaillm;
+          jaillm = jaillm;
           image = import lib/image.nix pkgs { };
         };
       }
