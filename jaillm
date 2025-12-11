@@ -19,7 +19,7 @@ if [ ! -f "$filepath" ]; then
     exit 1
 fi
 
-export JAILLM_FLAKE="github:myme/jaillm"
+export JAILLM_FLAKE=${JAILLM_FLAKE:-"github:myme/jaillm"}
 export JAILLM_NIX="$(readlink -f "$filepath")"
 
 nix run --impure --expr '
