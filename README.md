@@ -4,19 +4,60 @@
 
 ## Basic Usage
 
+### `jaillm.nix`
+
+```nix
+pkgs:
+{
+  entry = pkgs.bashInteractive;
+  llms = [ pkgs.claude-code pkgs.gemini-cli ];
+  extraUtils = [
+    pkgs.curl
+  ];
+}
+```
+
+### Claude
+
+Write `jaillm.nix`:
+
+```nix
+pkgs:
+{
+  llms = [ pkgs.claude-code ];
+}
+```
+
 Run [Claude](https://claude.ai):
 
 ```nix
-nix run github:myme/jaillm claude
+nix run github:myme/jaillm
+```
+
+### Gemini
+
+```nix
+pkgs:
+{
+  llms = [ pkgs.claude-code ];
+}
 ```
 
 Run [Gemini](https://gemini.google.com):
 
 ```nix
-nix run github:myme/jaillm gemini
+nix run github:myme/jaillm
 ```
 
-Launch a basic `bash` shell:
+Launch a basic `bash` shell with `claude` available:
+
+```nix
+pkgs:
+{
+  entry = pkgs.bashInteractive;
+  llms = [ pkgs.claude-code ];
+}
+```
 
 ```nix
 nix run github:myme/jaillm
