@@ -27,6 +27,14 @@ jail "jaillm" contents.entry (
     (cs.persist-home "jaillm")
     # Mount "$PWD" read-write into the jail at "$PWD"
     cs.mount-cwd
+    # Bind DNS configuration (especially important for WSL)
+    # If /etc/resolv.conf is a symlink, bind the target as well
+    (cs.add-runtime ''
+      if [ -L /etc/resolv.conf ]; then
+        resolv_target=$(readlink -f /etc/resolv.conf)
+        RUNTIME_ARGS+=(--ro-bind "$resolv_target" "$resolv_target")
+      fi
+    '')
     # 0.5% POSIX
     (cs.ro-bind "${pkgs.coreutils}/bin/env" "/usr/bin/env")
     (cs.set-env "SHELL" "${contents.shell}/bin/bash")
