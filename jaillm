@@ -4,7 +4,7 @@
 #
 # Usage:
 #
-# $ ./jaillm [-f|--file <path>] [run]
+# $ ./jaillm [-f|--file <path>] [run|init]
 
 set -eou pipefail
 
@@ -18,6 +18,7 @@ usage() {
     echo ""
     echo "Commands:"
     echo "  run    Run the jailed LLM (default)"
+    echo "  init   Create a jaillm.nix file"
     echo ""
     echo "Options:"
     echo "  -f, --file <path>  Path to jaillm.nix file (default: jaillm.nix)"
@@ -44,6 +45,27 @@ in
 '
 }
 
+# Init command
+cmd_init() {
+    if [ -f "$filepath" ]; then
+        echo "Error: File '$filepath' already exists."
+        exit 1
+    fi
+
+    cat > "$filepath" << 'EOF'
+pkgs:
+{
+  entry = pkgs.bashInteractive;
+  llms = [ pkgs.claude-code pkgs.gemini-cli ];
+  extraUtils = [
+    pkgs.curl
+  ];
+}
+EOF
+
+    echo "Created '$filepath'"
+}
+
 # Parse arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -59,6 +81,10 @@ while [[ $# -gt 0 ]]; do
             command="run"
             shift
             ;;
+        init)
+            command="init"
+            shift
+            ;;
         *)
             echo "Error: Unknown option or command '$1'"
             usage
@@ -71,5 +97,8 @@ done
 case $command in
     run)
         cmd_run
+        ;;
+    init)
+        cmd_init
         ;;
 esac
