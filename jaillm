@@ -4,28 +4,72 @@
 #
 # Usage:
 #
-# $ ./jaillm [jaillm.nix]
+# $ ./jaillm [-f|--file <path>] [run]
 
 set -eou pipefail
 
+# Default values
 filepath="jaillm.nix"
-if [ "$#" -ge 1 ]; then
-    filepath="$1"
-fi
+command="run"
 
-# If not a file, fail
-if [ ! -f "$filepath" ]; then
-    echo "Error: File '$filepath' not found."
-    exit 1
-fi
+# Show usage information
+usage() {
+    echo "Usage: jaillm [-f|--file <path>] [command]"
+    echo ""
+    echo "Commands:"
+    echo "  run    Run the jailed LLM (default)"
+    echo ""
+    echo "Options:"
+    echo "  -f, --file <path>  Path to jaillm.nix file (default: jaillm.nix)"
+    echo "  -h, --help         Show this help message"
+}
 
-export JAILLM_FLAKE=${JAILLM_FLAKE:-"github:myme/jaillm"}
-export JAILLM_NIX="$(readlink -f "$filepath")"
+# Run command
+cmd_run() {
+    # If not a file, fail
+    if [ ! -f "$filepath" ]; then
+        echo "Error: File '$filepath' not found."
+        exit 1
+    fi
 
-nix run --impure --expr '
+    export JAILLM_FLAKE=${JAILLM_FLAKE:-"github:myme/jaillm"}
+    export JAILLM_NIX="$(readlink -f "$filepath")"
+
+    nix run --impure --expr '
 let
   jaillm = builtins.getFlake (builtins.getEnv "JAILLM_FLAKE");
   config = import (builtins.getEnv "JAILLM_NIX");
 in
   jaillm.lib.build (import <nixpkgs>) config
 '
+}
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -f|--file)
+            filepath="$2"
+            shift 2
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        run)
+            command="run"
+            shift
+            ;;
+        *)
+            echo "Error: Unknown option or command '$1'"
+            usage
+            exit 1
+            ;;
+    esac
+done
+
+# Execute the command
+case $command in
+    run)
+        cmd_run
+        ;;
+esac
