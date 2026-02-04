@@ -38,10 +38,14 @@ jail "jaillm" contents.entry (
     # 0.5% POSIX
     (cs.ro-bind "${pkgs.coreutils}/bin/env" "/usr/bin/env")
     (cs.set-env "SHELL" "${contents.shell}/bin/bash")
-    # Allocate a PTY for interactive commands
+    # Start SIGWINCH forwarder outside jail
+    (cs.add-runtime ''
+      ${pkgs.bash}/bin/bash ${./winch-monitor.sh} $$ </dev/tty &
+    '')
+    # Allocate PTY with script
     (cs.wrap-entry (entry: ''
       safe_cmd=$(printf '%q ' ${entry})
-      script -qc "$safe_cmd" /dev/null
+      exec ${pkgs.util-linux}/bin/script -qec "$safe_cmd" /dev/null
     ''))
   ]
   ++ (extraCombinators jail.combinators)
