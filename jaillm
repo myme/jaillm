@@ -33,15 +33,17 @@ cmd_run() {
         exit 1
     fi
 
+    export NIXPKGS_FLAKE=${NIXPKGS_FLAKE:-"github:NixOS/nixpkgs/nixpkgs-unstable"}
     export JAILLM_FLAKE=${JAILLM_FLAKE:-"github:myme/jaillm"}
     export JAILLM_NIX="$(readlink -f "$filepath")"
 
     nix run --impure --expr '
 let
+  nixpkgs = builtins.getFlake (builtins.getEnv "NIXPKGS_FLAKE");
   jaillm = builtins.getFlake (builtins.getEnv "JAILLM_FLAKE");
   config = import (builtins.getEnv "JAILLM_NIX");
 in
-  jaillm.lib.build (import <nixpkgs>) config
+  jaillm.lib.build (import nixpkgs) config
 '
 }
 
