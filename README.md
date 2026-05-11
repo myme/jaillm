@@ -1,6 +1,6 @@
-# JaiLLM 
+# JaiLLM
 
-`jaillm` is an `nix` wrapper around various LLM TUIs, using [jail.nix](https://git.sr.ht/~alexdavid/jail.nix) for sandboxing.
+`jaillm` is a `nix` wrapper around various LLM TUIs, using [jail.nix](https://git.sr.ht/~alexdavid/jail.nix) for sandboxing.
 
 ## Basic Usage
 
@@ -11,6 +11,7 @@ pkgs:
 {
   entry = pkgs.bashInteractive;
   llms = [ pkgs.claude-code pkgs.gemini-cli ];
+  shareHomePaths = [ ".claude" ];
   extraUtils = [
     pkgs.curl
   ];
@@ -25,43 +26,79 @@ Write `jaillm.nix`:
 pkgs:
 {
   llms = [ pkgs.claude-code ];
+  shareHomePaths = [ ".claude" ];
 }
 ```
 
 Run [Claude](https://claude.ai):
 
-```nix
+```bash
 nix run github:myme/jaillm
 ```
 
 ### Gemini
 
+Write `jaillm.nix`:
+
 ```nix
 pkgs:
 {
-  llms = [ pkgs.claude-code ];
+  llms = [ pkgs.gemini-cli ];
 }
 ```
 
 Run [Gemini](https://gemini.google.com):
 
-```nix
+```bash
 nix run github:myme/jaillm
 ```
 
-Launch a basic `bash` shell with `claude` available:
+### Shell with multiple LLMs
+
+Launch a `bash` shell with multiple LLMs available:
 
 ```nix
 pkgs:
 {
   entry = pkgs.bashInteractive;
-  llms = [ pkgs.claude-code ];
+  llms = [ pkgs.claude-code pkgs.gemini-cli ];
+  shareHomePaths = [ ".claude" ];
 }
 ```
 
-```nix
+```bash
 nix run github:myme/jaillm
 ```
+
+## Configuration
+
+### Options
+
+| Option | Default | Description |
+|---|---|---|
+| `entry` | First LLM if only one, otherwise `shell` | Entrypoint for the jail |
+| `shell` | `pkgs.bashInteractive` | Shell to use inside the jail |
+| `llms` | `[ pkgs.codex pkgs.claude-code pkgs.github-copilot-cli pkgs.gemini-cli ]` | LLM packages to include |
+| `shareHomePaths` | `[]` | Paths relative to `$HOME` to bind-mount (read-write) from the host into the jail |
+| `extraUtils` | `[]` | Additional packages to include |
+| `extraCombinators` | `_: []` | Additional [jail.nix](https://git.sr.ht/~alexdavid/jail.nix) combinators |
+
+### Sharing host paths
+
+By default, the jail uses a dedicated `$HOME` directory that persists across restarts.
+This means tools like `claude` need to re-authenticate on first use.
+
+Use `shareHomePaths` to bind-mount directories from your real `$HOME` into the jail:
+
+```nix
+pkgs:
+{
+  llms = [ pkgs.claude-code ];
+  shareHomePaths = [ ".claude" ];
+}
+```
+
+The paths are bind-mounted read-write and only if they exist on the host.
 
 ## Nix Flakes
 

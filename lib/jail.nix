@@ -8,13 +8,23 @@ pkgs:
 {
   extraCombinators ? _: [],
   extraUtils ? [],
+  # Paths relative to $HOME to bind-mount from the host into the jail (e.g. [".claude"])
+  shareHomePaths ? [],
   ...
 }@args:
 
 let
   jail = jail-nix.lib.init pkgs;
   cs = jail.combinators;
-  contents = import ./contents.nix pkgs (builtins.removeAttrs args [ "extraCombinators" ]);
+  contents = import ./contents.nix pkgs (builtins.removeAttrs args [ "extraCombinators" "shareHomePaths" ]);
+
+  shareHomeCombinator = cs.add-runtime (
+    builtins.concatStringsSep "\n" (map (p: ''
+      if [ -e "$HOME/${p}" ]; then
+        RUNTIME_ARGS+=(--bind "$HOME/${p}" "$HOME/${p}")
+      fi
+    '') shareHomePaths)
+  );
 in
 jail "jaillm" contents.entry (
   [
@@ -25,6 +35,8 @@ jail "jaillm" contents.entry (
     cs.open-urls-in-browser
     # Persist $HOME directory across jail restarts (~/.local/share/jail.nix/home/...)
     (cs.persist-home "jaillm")
+    # Share specified host $HOME paths into the jail (e.g. ~/.claude for auth)
+  ] ++ pkgs.lib.optional (shareHomePaths != []) shareHomeCombinator ++ [
     # Mount "$PWD" read-write into the jail at "$PWD"
     cs.mount-cwd
     # Bind DNS configuration (especially important for WSL)

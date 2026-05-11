@@ -59,6 +59,8 @@ pkgs:
 {
   entry = pkgs.bashInteractive;
   llms = [ pkgs.claude-code pkgs.gemini-cli ];
+  # Share host $HOME paths into the jail (e.g. for auth)
+  shareHomePaths = [ ".claude" ];
   extraUtils = [
     pkgs.curl
   ];
