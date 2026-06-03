@@ -11,14 +11,19 @@ set -eou pipefail
 # Default values
 filepath="jaillm.nix"
 command="run"
+# Command to run inside the jail instead of the configured entrypoint.
+# Populated by any arguments following the `run` command.
+cmd_args=()
 
 # Show usage information
 usage() {
-    echo "Usage: jaillm [-f|--file <path>] [command]"
+    echo "Usage: jaillm [-f|--file <path>] [run [-- <cmd>...] | init]"
     echo ""
     echo "Commands:"
-    echo "  run    Run the jailed LLM (default)"
-    echo "  init   Create a jaillm.nix file"
+    echo "  run [<cmd>...]   Run the jailed LLM (default). Any arguments after"
+    echo "                   'run' override the configured entrypoint, e.g."
+    echo "                   'jaillm run bash' opens a shell inside the jail."
+    echo "  init             Create a jaillm.nix file"
     echo ""
     echo "Options:"
     echo "  -f, --file <path>  Path to jaillm.nix file (default: jaillm.nix)"
@@ -37,13 +42,27 @@ cmd_run() {
     export JAILLM_FLAKE=${JAILLM_FLAKE:-"github:myme/jaillm"}
     export JAILLM_NIX="$(readlink -f "$filepath")"
 
+    # Arguments after `run` override the configured entrypoint. Quote them into
+    # a single command string that's safe to re-evaluate inside the jail.
+    if [ ${#cmd_args[@]} -gt 0 ]; then
+        export JAILLM_CMD="$(printf '%q ' "${cmd_args[@]}")"
+    fi
+
     nix run --impure --expr '
 let
   nixpkgs = builtins.getFlake (builtins.getEnv "NIXPKGS_FLAKE");
   jaillm = builtins.getFlake (builtins.getEnv "JAILLM_FLAKE");
   config = import (builtins.getEnv "JAILLM_NIX");
 in
-  jaillm.lib.build (import nixpkgs) config
+  jaillm.lib.build (import nixpkgs) (pkgs:
+    let
+      cfg = config pkgs;
+      cmd = builtins.getEnv "JAILLM_CMD";
+    in
+    # Override the configured entrypoint with the command passed to `run`.
+    cfg // (if cmd != "" then {
+      entry = pkgs.writeShellScriptBin "jaillm-entry" "exec ${cmd}";
+    } else { }))
 '
 }
 
@@ -84,6 +103,10 @@ while [[ $# -gt 0 ]]; do
         run)
             command="run"
             shift
+            # Everything after `run` is the command to run inside the jail,
+            # overriding the configured entrypoint.
+            cmd_args=("$@")
+            break
             ;;
         init)
             command="init"

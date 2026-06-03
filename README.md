@@ -70,6 +70,23 @@ pkgs:
 nix run github:myme/jaillm
 ```
 
+### Overriding the entrypoint
+
+Any arguments after `run` override the configured `entry` and are executed
+inside the jail instead. This is handy for dropping into a shell or running a
+one-off command in the sandboxed environment:
+
+```bash
+# Open a bash shell inside the jail
+nix run github:myme/jaillm -- run bash
+
+# Run a specific LLM when several are configured
+nix run github:myme/jaillm -- run claude --help
+```
+
+The command must be available inside the jail (i.e. part of `llms`, `utils`,
+or `extraUtils`).
+
 ## Configuration
 
 ### Options
